@@ -1,19 +1,14 @@
-import type { ReactNode } from 'react'
+import type { ButtonHTMLAttributes } from 'react'
 import { cx } from '@/lib/cx'
 import { Icon, type IconName } from '../Icon'
 import styles from './Button.module.css'
 
-export interface ButtonProps {
-  children?: ReactNode
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost'
   size?: 'sm' | 'md'
   iconLeft?: IconName
   iconRight?: IconName
   fullWidth?: boolean
-  disabled?: boolean
-  onClick?: () => void
-  className?: string
-  'aria-label'?: string
 }
 
 export function Button({
@@ -23,27 +18,20 @@ export function Button({
   iconLeft,
   iconRight,
   fullWidth,
-  disabled,
-  onClick,
   className,
+  type = 'button',
   ...rest
 }: ButtonProps) {
   return (
-    <div
-      className={cx(
-        styles.button,
-        styles[variant],
-        styles[size],
-        fullWidth && styles.fullWidth,
-        disabled && styles.disabled,
-        className
-      )}
-      onClick={disabled ? undefined : onClick}
+    <button
+      // Default to "button" so it never submits a surrounding form by accident.
+      type={type}
+      className={cx(styles.button, styles[variant], styles[size], fullWidth && styles.fullWidth, className)}
       {...rest}
     >
       {iconLeft && <Icon name={iconLeft} size={16} />}
       {children}
       {iconRight && <Icon name={iconRight} size={16} />}
-    </div>
+    </button>
   )
 }
