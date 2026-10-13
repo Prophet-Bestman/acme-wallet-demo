@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import type { ApiErrorBody, Conversion, Currency, Rate, User } from '@/types/api'
+import type { Conversion, Currency, Rate, User } from '@/types/api'
 import { CURRENCIES } from '@/types/api'
 import { Button, Card, Input, Money, Select } from '@/components/ui'
 import { convert, getMe, getRate } from '@/lib/api/endpoints'
@@ -39,16 +39,9 @@ export default function ConvertPage() {
     setError('')
     setSubmitting(true)
     try {
-      // The client doesn't throw on 4xx/5xx, so check for an error body.
-      const res = (await convert({ from, to, amount: value })) as Partial<ApiErrorBody> & {
-        data?: Conversion
-      }
-      if (res.error) {
-        setError(res.error.message)
-      } else if (res.data) {
-        setResult(res.data)
-        setAmount('')
-      }
+      const res = await convert({ from, to, amount: value })
+      setResult(res.data)
+      setAmount('')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
     } finally {
