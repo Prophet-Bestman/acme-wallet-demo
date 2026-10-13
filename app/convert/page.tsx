@@ -1,10 +1,11 @@
 'use client'
-import { useEffect, useState } from 'react'
-import type { Conversion, Currency, Rate, User } from '@/types/api'
+import { useState } from 'react'
+import type { Currency } from '@/types/api'
 import { CURRENCIES } from '@/types/api'
 import { Button, Card, Input, Money, Select } from '@/components/ui'
-import { convert, getMe, getRate } from '@/lib/api/endpoints'
+import { ApiError } from '@/lib/api/client'
 import { parseMoney } from '@/lib/format'
+import { useConvert, useMe, useRate } from '@/lib/query/hooks'
 import styles from './page.module.css'
 
 const CURRENCY_OPTIONS = CURRENCIES.map((c) => ({ value: c, label: c }))
@@ -13,20 +14,14 @@ export default function ConvertPage() {
   const [from, setFrom] = useState<Currency>('USD')
   const [to, setTo] = useState<Currency>('NGN')
   const [amount, setAmount] = useState('')
-  const [result, setResult] = useState<Conversion | null>(null)
-  const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
 
-  const [user, setUser] = useState<User>()
-  const [rate, setRate] = useState<Rate>()
-
-  useEffect(() => {
-    getMe().then((res) => setUser(res.data))
-  }, [])
-
-  useEffect(() => {
-    getRate(from, to).then((res) => setRate(res.data))
-  }, [from, to])
+  const { data: user } = useMe()
+  // Keyed by pair, so a slow response for an old pair can't overwrite the current rate.
+  const { data: rate } = useRate(from, to)
+  const conversion = useConvert()
+  const submitting = conversion.isPending
+  const result = conversion.data
+  const error = conversion.error
 
   const value = parseMoney(amount, from) ?? 0
   const fee = Math.round(value * 0.015)
@@ -34,19 +29,9 @@ export default function ConvertPage() {
   const wallet = user?.wallets.find((w) => w.currency === from)
   const canSubmit = value > 0 && from !== to && !submitting
 
-  const handleConvert = async () => {
+  const handleConvert = () => {
     if (!canSubmit) return
-    setError('')
-    setSubmitting(true)
-    try {
-      const res = await convert({ from, to, amount: value })
-      setResult(res.data)
-      setAmount('')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
-    } finally {
-      setSubmitting(false)
-    }
+    conversion.mutate({ from, to, amount: value }, { onSuccess: () => setAmount('') })
   }
 
   return (
@@ -109,7 +94,11 @@ export default function ConvertPage() {
           </div>
         </dl>
 
-        {error && <p className={styles.error}>{error}</p>}
+        {error && (
+          <p className={styles.error} role="alert">
+            {error instanceof ApiError ? error.message : 'Something went wrong. Please try again.'}
+          </p>
+        )}
 
         <Button fullWidth onClick={handleConvert} disabled={!canSubmit}>
           {submitting ? 'Converting…' : 'Convert'}
