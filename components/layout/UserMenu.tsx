@@ -1,7 +1,7 @@
 'use client'
-import { useState } from 'react'
 import type { User } from '@/types/api'
 import { Avatar, Icon } from '@/components/ui'
+import { useDisclosure } from '@/lib/hooks'
 import { useMe } from '@/lib/query/hooks'
 import styles from './UserMenu.module.css'
 
@@ -12,12 +12,12 @@ const TIER_LABELS: Record<User['tier'], string> = {
 }
 
 export function UserMenu() {
-  const [open, setOpen] = useState(false)
+  const { isOpen: open, toggle } = useDisclosure()
   const { data: user } = useMe()
 
   return (
     <div className={styles.menu}>
-      <button type="button" className={styles.trigger} onClick={() => setOpen(!open)} aria-expanded={open}>
+      <button type="button" className={styles.trigger} onClick={toggle} aria-expanded={open}>
         <Avatar src={user?.avatarUrl ?? null} alt="" size="sm" />
         <span className={styles.name}>{user?.firstName}</span>
         <Icon name="chevron-down" size={16} />
