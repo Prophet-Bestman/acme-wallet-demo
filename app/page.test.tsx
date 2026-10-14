@@ -38,7 +38,7 @@ describe('DashboardPage', () => {
       Promise.resolve(
         url.endsWith('/me')
           ? json(200, { data: { firstName: 'Ada', lastName: 'Obi', wallets: [] } })
-          : json(200, { data: [] })
+          : json(200, { data: [], meta: { page: 1, limit: 5, total: 0, totalPages: 1 } })
       )
     )
     await userEvent.click(screen.getByText('Retry'))

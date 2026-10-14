@@ -1,20 +1,14 @@
 import type { Currency, TransactionStatus, TransactionType } from '@/types/api'
 import { CURRENCIES } from '@/types/api'
 import type { TransactionQuery } from '@/lib/api/endpoints'
+import { TRANSACTION_STATUS_LABELS, TRANSACTION_TYPE_LABELS } from '@/lib/format'
 
-export const TRANSACTION_TYPES: readonly TransactionType[] = [
-  'deposit',
-  'withdrawal',
-  'transfer_in',
-  'transfer_out',
-  'conversion',
-  'card_payment',
-  'bill_payment',
-]
-export const TRANSACTION_STATUSES: readonly TransactionStatus[] = ['successful', 'pending', 'failed']
+// Derived from the label records so a new value can't be missing here (Record<> is exhaustive).
+export const TRANSACTION_TYPES = Object.keys(TRANSACTION_TYPE_LABELS) as TransactionType[]
+export const TRANSACTION_STATUSES = Object.keys(TRANSACTION_STATUS_LABELS) as TransactionStatus[]
 
 export const DEFAULT_LIMIT = 20
-export const MAX_LIMIT = 100
+const MAX_LIMIT = 100
 const MAX_QUERY_LENGTH = 100
 
 /** Everything about the /transactions view that lives in the URL. */
@@ -34,6 +28,9 @@ export interface TransactionUrlState {
 }
 
 export type TransactionFilters = Pick<TransactionUrlState, 'type' | 'status' | 'currency' | 'from' | 'to'>
+
+/** Trimmed and capped, so the box and the URL agree on what counts as a change. */
+export const normalizeQuery = (q: string) => q.trim().slice(0, MAX_QUERY_LENGTH)
 
 const oneOf = <T extends string>(allowed: readonly T[], value: string | null): T | undefined =>
   value !== null && (allowed as readonly string[]).includes(value) ? (value as T) : undefined
@@ -63,7 +60,7 @@ export function parseTransactionUrlState(params: Pick<URLSearchParams, 'get'>): 
   return {
     page: positiveInt(params.get('page')) ?? 1,
     limit: limit !== undefined && limit <= MAX_LIMIT ? limit : DEFAULT_LIMIT,
-    q: (params.get('q') ?? '').trim().slice(0, MAX_QUERY_LENGTH),
+    q: normalizeQuery(params.get('q') ?? ''),
     type: oneOf(TRANSACTION_TYPES, params.get('type')),
     status: oneOf(TRANSACTION_STATUSES, params.get('status')),
     currency: oneOf(CURRENCIES, params.get('currency')),

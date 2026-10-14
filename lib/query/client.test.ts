@@ -12,6 +12,10 @@ describe('isRetryable', () => {
     expect(isRetryable(apiError(status))).toBe(false)
   })
 
+  it('does not retry an unreadable response, even with a 5xx status', () => {
+    expect(isRetryable(new ApiError(502, 'INVALID_RESPONSE', 'x'))).toBe(false)
+  })
+
   it('does not retry errors that are not ApiErrors', () => {
     expect(isRetryable(new TypeError('bug'))).toBe(false)
   })

@@ -15,7 +15,7 @@ export interface MoneyProps {
 export function Money({ amount, currency, sign, className }: MoneyProps) {
   // formatMoney pins the locale and two decimals, so server and client render the same string.
   const text = sign
-    ? formatMoney(sign === 'debit' ? -Math.abs(amount) : Math.abs(amount), currency, {
+    ? formatMoney(sign === 'debit' ? -amount : amount, currency, {
         signDisplay: 'always',
       })
     : formatMoney(amount, currency)

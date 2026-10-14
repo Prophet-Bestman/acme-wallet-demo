@@ -56,7 +56,7 @@ describe('useTransactionTableState', () => {
     const { result, act } = setup('__scenario=slow&page=4')
     act(() => result.current.setFilter('status', 'failed'))
     expect(lastHref(nav.push)).toBe('/transactions?__scenario=slow&status=failed')
-    expect(result.current.page).toBe(1)
+    expect(result.current.state.page).toBe(1)
   })
 
   it('clears a filter when set to an empty value', () => {
@@ -116,7 +116,7 @@ describe('useTransactionTableState', () => {
     const { result, act } = setup('status=failed')
     act(() => result.current.openTransaction('txn_1'))
     expect(lastHref(nav.push)).toBe('/transactions?status=failed&tx=txn_1')
-    expect(result.current.selectedId).toBe('txn_1')
+    expect(result.current.state.tx).toBe('txn_1')
 
     act(() => result.current.closeTransaction())
     expect(nav.back).toHaveBeenCalledTimes(1)

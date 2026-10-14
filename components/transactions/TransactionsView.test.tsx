@@ -87,12 +87,30 @@ describe('TransactionsView', () => {
 
   it('sends the URL state to the API', async () => {
     fetchMock.mockImplementation(() => Promise.resolve(page([tx('a')])))
-    renderView('status=failed&currency=USD&page=2&status=garbage')
+    renderView('status=failed&currency=USD&page=2')
     await screen.findByText('Narration a')
     const url = fetchMock.mock.calls[0][0] as string
     expect(url).toContain('status=failed')
     expect(url).toContain('currency=USD')
     expect(url).toContain('page=2')
+  })
+
+  it('never sends a param that fails validation', async () => {
+    fetchMock.mockImplementation(() => Promise.resolve(page([tx('a')])))
+    renderView('status=garbage&type=refund&page=-3')
+    await screen.findByText('Narration a')
+    const url = fetchMock.mock.calls[0][0] as string
+    expect(url).not.toContain('status=')
+    expect(url).not.toContain('type=')
+    expect(url).toContain('page=1')
+  })
+
+  it('does not claim the account is empty while correcting an out-of-range page', async () => {
+    fetchMock.mockImplementation(() => Promise.resolve(page([], { page: 12, total: 30, totalPages: 2 })))
+    renderView('page=12')
+    await vi.waitFor(() => expect(nav.replace).toHaveBeenCalled())
+    expect(screen.queryByText('No transactions yet')).toBeNull()
+    expect(screen.queryByText('No results')).toBeNull()
   })
 
   it('distinguishes "no transactions yet" from "no results"', async () => {

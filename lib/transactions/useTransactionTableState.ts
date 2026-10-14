@@ -1,10 +1,10 @@
-'use client'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { useDebounce } from '@/lib/hooks'
 import {
   hasActiveFilters,
   isDateRangeInvalid,
+  normalizeQuery,
   parseTransactionUrlState,
   serializeTransactionUrlState,
   toTransactionQuery,
@@ -13,8 +13,6 @@ import {
 } from './url-state'
 
 const SEARCH_DEBOUNCE_MS = 300
-
-const normalizeSearch = (value: string) => parseTransactionUrlState(new URLSearchParams({ q: value })).q
 
 /**
  * Search, filters, pagination and the open transaction for /transactions, with the URL as the
@@ -42,12 +40,12 @@ export function useTransactionTableState() {
   const [syncedQ, setSyncedQ] = useState(state.q)
   if (state.q !== syncedQ) {
     setSyncedQ(state.q)
-    if (state.q !== normalizeSearch(search)) setSearchInput(state.q)
+    if (state.q !== normalizeQuery(search)) setSearchInput(state.q)
   }
 
   // Typing replaces the history entry so Back skips every keystroke.
   const commitSearch = useEffectEvent((value: string) => {
-    const q = normalizeSearch(value)
+    const q = normalizeQuery(value)
     if (q !== state.q) navigate({ ...state, q, page: 1 }, 'replace')
   })
   useEffect(() => {
@@ -55,11 +53,8 @@ export function useTransactionTableState() {
   }, [search])
 
   // ─── Filters and pagination: each change is its own history entry ─────────
-  const setFilters = (filters: Partial<TransactionFilters>) =>
-    navigate({ ...state, ...filters, page: 1 }, 'push')
-
   const setFilter = <K extends keyof TransactionFilters>(key: K, value: TransactionFilters[K]) =>
-    setFilters({ [key]: value || undefined } as Partial<TransactionFilters>)
+    navigate({ ...state, [key]: value || undefined, page: 1 }, 'push')
 
   const resetFilters = () => {
     setSearchInput('')
@@ -99,14 +94,11 @@ export function useTransactionTableState() {
     searchInput,
     setSearchInput,
     setFilter,
-    setFilters,
     resetFilters,
     filtersActive: hasActiveFilters(state),
     dateRangeInvalid: isDateRangeInvalid(state),
-    page: state.page,
     setPage,
     clampPage,
-    selectedId: state.tx ?? null,
     openTransaction,
     closeTransaction,
     /** Pass straight to useTransactions; it is the query key too. */

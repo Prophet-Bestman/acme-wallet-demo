@@ -63,7 +63,7 @@ export function TransactionsView() {
         role="alert"
       />
     )
-  } else if (!rows?.length) {
+  } else if (meta?.total === 0) {
     content = table.filtersActive ? (
       <StateMessage
         icon="search"
@@ -82,6 +82,10 @@ export function TransactionsView() {
         body="Deposits, transfers and payments will show up here."
       />
     )
+  } else if (!rows?.length) {
+    // An out-of-range page (e.g. ?page=12 of 2) is empty but the account isn't; clampPage is
+    // already moving us, so don't flash an empty state that isn't true.
+    content = <TransactionListSkeleton />
   } else {
     content = rows.map((tx) => (
       <TransactionRow key={tx.id} transaction={tx} onSelect={() => table.openTransaction(tx.id)} />
@@ -140,7 +144,7 @@ export function TransactionsView() {
       </div>
 
       {meta && rows && rows.length > 0 && (
-        <Pagination page={table.page} totalPages={meta.totalPages} onPageChange={goToPage} />
+        <Pagination page={table.state.page} totalPages={meta.totalPages} onPageChange={goToPage} />
       )}
 
       <Drawer
@@ -167,8 +171,8 @@ export function TransactionsView() {
       </Drawer>
 
       <TransactionDetailsDrawer
-        id={table.selectedId}
-        placeholder={rows?.find((tx) => tx.id === table.selectedId)}
+        id={table.state.tx ?? null}
+        placeholder={rows?.find((tx) => tx.id === table.state.tx)}
         onClose={table.closeTransaction}
       />
     </div>

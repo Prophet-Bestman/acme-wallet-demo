@@ -1,4 +1,3 @@
-'use client'
 import { keepPreviousData, useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Currency, Transaction } from '@/types/api'
 import {
@@ -42,7 +41,6 @@ export function useRate(from: Currency, to: Currency) {
   return useQuery({
     queryKey: rateKeys.pair(from, to),
     queryFn: ({ signal }) => getRate(from, to, { signal }).then((res) => res.data),
-    enabled: from !== to,
   })
 }
 

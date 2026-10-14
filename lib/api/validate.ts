@@ -18,7 +18,7 @@ type UnknownRecord = Record<string, unknown>
 
 const isRecord = (value: unknown): value is UnknownRecord => typeof value === 'object' && value !== null
 
-const isMinorUnits = (value: unknown): value is number =>
+const isNonNegativeInt = (value: unknown): value is number =>
   typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
 
 const str = (value: unknown, fallback = '') => (typeof value === 'string' ? value : fallback)
@@ -33,7 +33,7 @@ export function parseTransaction(raw: unknown): Transaction | null {
   if (!isRecord(raw)) return null
   const { id, amount, currency } = raw
   if (typeof id !== 'string' || !id) return null
-  if (!isMinorUnits(amount)) return null
+  if (!isNonNegativeInt(amount)) return null
   if (typeof currency !== 'string' || !(CURRENCIES as readonly string[]).includes(currency)) return null
 
   return {
@@ -43,7 +43,7 @@ export function parseTransaction(raw: unknown): Transaction | null {
     reference: str(raw.reference),
     type: str(raw.type),
     status: str(raw.status),
-    fee: isMinorUnits(raw.fee) ? raw.fee : 0,
+    fee: isNonNegativeInt(raw.fee) ? raw.fee : 0,
     narration: str(raw.narration),
     counterparty: typeof raw.counterparty === 'string' ? raw.counterparty : null,
     createdAt: str(raw.createdAt),
@@ -54,8 +54,7 @@ function parseMeta(raw: unknown, rows: number): PageMeta {
   if (!isRecord(raw) || !Number.isSafeInteger(raw.totalPages) || (raw.totalPages as number) < 1) {
     invalidResponse('transactions.invalid_response', { field: 'meta.totalPages' })
   }
-  const int = (value: unknown, fallback: number) =>
-    typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : fallback
+  const int = (value: unknown, fallback: number) => (isNonNegativeInt(value) ? value : fallback)
   return {
     totalPages: raw.totalPages as number,
     page: int(raw.page, 1),

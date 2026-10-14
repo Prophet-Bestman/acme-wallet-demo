@@ -10,6 +10,8 @@ const MAX_RETRIES = 2
  */
 export function isRetryable(error: unknown): boolean {
   if (!(error instanceof ApiError)) return false
+  // Malformed data won't fix itself on a second request, whatever the status says.
+  if (error.code === 'INVALID_RESPONSE') return false
   const { status } = error
   if (status === 0 || status === 408 || status === 429) return true
   return status >= 500 && status !== 501
