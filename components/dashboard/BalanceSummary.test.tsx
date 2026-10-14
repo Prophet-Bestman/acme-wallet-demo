@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
+import { HiddenBalancesProvider } from '@/components/layout'
 import type { Wallet } from '@/types/api'
 import { BalanceSummary } from './BalanceSummary'
 
@@ -32,7 +33,9 @@ function renderSummary(list: Wallet[] = wallets) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={client}>
-      <BalanceSummary wallets={list} />
+      <HiddenBalancesProvider>
+        <BalanceSummary wallets={list} />
+      </HiddenBalancesProvider>
     </QueryClientProvider>
   )
 }
@@ -67,7 +70,12 @@ describe('BalanceSummary hide toggle', () => {
   it('hides every amount on the page, not just the total, and remembers it', async () => {
     const { WalletCard } = await import('./WalletCard')
     renderSummary([{ currency: 'NGN', balance: 100000 }])
-    render(<WalletCard wallet={{ currency: 'NGN', balance: 250000 }} />)
+    // A separate tree, like another part of the page: it follows the same stored setting.
+    render(
+      <HiddenBalancesProvider>
+        <WalletCard wallet={{ currency: 'NGN', balance: 250000 }} />
+      </HiddenBalancesProvider>
+    )
     expect(screen.getByText('₦2,500.00')).toBeInTheDocument()
 
     const { default: userEvent } = await import('@testing-library/user-event')

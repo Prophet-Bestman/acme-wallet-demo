@@ -11,7 +11,7 @@ export type TransactionStatus = 'successful' | 'pending' | 'failed'
 
 /**
  * A value the backend owns and may extend. Known values still autocomplete and narrow,
- * but code must handle the unknown case (see lib/transactions/display.ts).
+ * but code must handle the unknown case (see components/transactions/display.ts).
  */
 export type OpenEnum<T extends string> = T | (string & {})
 

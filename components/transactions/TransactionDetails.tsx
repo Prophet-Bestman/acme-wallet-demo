@@ -4,7 +4,7 @@ import type { Transaction } from '@/types/api'
 import { Badge, Icon, Money } from '@/components/ui'
 import { cx } from '@/lib/cx'
 import { formatDateTime } from '@/lib/format'
-import { transactionStatusDisplay, transactionTypeDisplay } from '@/lib/transactions/display'
+import { transactionStatusDisplay, transactionTypeDisplay } from './display'
 import { TransactionAvatar } from './TransactionAvatar'
 import styles from './TransactionDetails.module.css'
 

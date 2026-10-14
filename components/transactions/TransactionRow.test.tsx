@@ -1,5 +1,5 @@
-import { act, render, screen } from '@testing-library/react'
-import { setBalancesHidden } from '@/lib/hooks'
+import { render, screen } from '@testing-library/react'
+import { MoneyMaskProvider } from '@/components/ui'
 import type { Transaction } from '@/types/api'
 import { TransactionRow } from './TransactionRow'
 
@@ -67,11 +67,13 @@ describe('TransactionRow', () => {
   })
 
   it('masks the amount and the fee when balances are hidden', () => {
-    act(() => setBalancesHidden(true))
-    render(<TransactionRow transaction={tx} />)
+    render(
+      <MoneyMaskProvider masked>
+        <TransactionRow transaction={tx} />
+      </MoneyMaskProvider>
+    )
     expect(screen.queryByText(/45\.99/)).toBeNull()
     expect(screen.queryByText(/0\.30/)).toBeNull()
     expect(screen.getAllByText('Amount hidden')).toHaveLength(2)
-    act(() => setBalancesHidden(false))
   })
 })

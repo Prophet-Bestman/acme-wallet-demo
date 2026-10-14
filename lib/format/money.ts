@@ -23,7 +23,7 @@ function getFormatter(currency: Currency, signDisplay: Intl.NumberFormatOptions[
 
 /**
  * Format an amount in minor units, e.g. formatMoney(150050, 'NGN') -> "₦1,500.50".
- * Use `signDisplay: 'always'` with a negative value for debits.
+ * Use `signDisplay: 'exceptZero'` with a negative value for debits ('always' prints a zero debit as -0).
  */
 export function formatMoney(
   minor: number,

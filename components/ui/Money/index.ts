@@ -1,1 +1,1 @@
-export { Money, type MoneyProps } from './Money'
+export { Money, MoneyMaskProvider, type MoneyProps } from './Money'

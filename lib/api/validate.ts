@@ -11,7 +11,7 @@ import { ApiError } from './client'
  * `currency` (money formatting), and `meta.totalPages` (pagination). A broken critical
  * field fails the response as `ApiError(502, 'INVALID_RESPONSE')`, so the error state shows
  * instead of a crash. Everything else is soft: a bad value falls back to a safe default.
- * `type` and `status` stay open strings; lib/transactions/display.ts handles unknown ones.
+ * `type` and `status` stay open strings; components/transactions/display.ts handles unknown ones.
  */
 
 type UnknownRecord = Record<string, unknown>

@@ -1,7 +1,7 @@
 import type { Transaction } from '@/types/api'
 import { Icon } from '@/components/ui'
 import { cx } from '@/lib/cx'
-import { initials, transactionTypeDisplay } from '@/lib/transactions/display'
+import { initials, transactionTypeDisplay } from './display'
 import styles from './TransactionAvatar.module.css'
 
 /** Counterparty initials when there is one (transfers), otherwise the type icon. */
