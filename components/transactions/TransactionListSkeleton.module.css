@@ -1,0 +1,78 @@
+/* Mirrors the day heading and TransactionRow's size so content doesn't jump when data arrives. */
+.groupBar {
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-subtle);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 60px;
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.icon,
+.line {
+  background: linear-gradient(
+    90deg,
+    var(--color-border) 25%,
+    var(--color-bg-subtle) 50%,
+    var(--color-border) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+}
+
+.main,
+.end {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.end {
+  align-items: flex-end;
+}
+
+.line {
+  display: block;
+  height: 10px;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon,
+  .line {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .row,
+  .groupBar {
+    padding-inline: var(--space-4);
+  }
+}

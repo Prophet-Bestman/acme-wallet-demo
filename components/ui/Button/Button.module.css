@@ -59,7 +59,19 @@
   width: 100%;
 }
 
-.disabled {
+.button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.primary:disabled:hover {
+  background: var(--color-primary);
+}
+
+.secondary:disabled:hover {
+  background: var(--color-surface);
+}
+
+.ghost:disabled:hover {
+  background: transparent;
 }
