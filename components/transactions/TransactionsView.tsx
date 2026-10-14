@@ -1,11 +1,11 @@
 'use client'
 import { useEffect, useEffectEvent, useRef, type ReactNode } from 'react'
 import type { Transaction } from '@/types/api'
-import { Button, Card, Drawer, Icon, Input, Pagination, type IconName } from '@/components/ui'
+import { Button, Card, Drawer, Icon, Pagination, type IconName } from '@/components/ui'
 import { ApiError } from '@/lib/api/client'
 import { cx } from '@/lib/cx'
-import { useDisclosure } from '@/lib/hooks'
 import { useTransaction, useTransactions } from '@/lib/query/hooks'
+import { groupByDay } from '@/lib/transactions/group'
 import { useTransactionTableState } from '@/lib/transactions/useTransactionTableState'
 import { TransactionDetails } from './TransactionDetails'
 import { TransactionFilters } from './TransactionFilters'
@@ -18,14 +18,10 @@ export function TransactionsView() {
   const { data, isPending, isError, error, isFetching, isPlaceholderData, refetch } = useTransactions(
     table.queryParams
   )
-  const filterSheet = useDisclosure()
   const listRef = useRef<HTMLDivElement>(null)
 
   const rows = data?.data
   const meta = data?.meta
-  const { type, status, currency, from, to } = table.state
-  const filters = { type, status, currency, from, to }
-  const activeFilterCount = Object.values(filters).filter(Boolean).length
 
   // `?page=12` after a filter leaves 3 pages: move to the last real page.
   const clampPage = useEffectEvent((totalPages: number) => table.clampPage(totalPages))
@@ -87,8 +83,18 @@ export function TransactionsView() {
     // already moving us, so don't flash an empty state that isn't true.
     content = <TransactionListSkeleton />
   } else {
-    content = rows.map((tx) => (
-      <TransactionRow key={tx.id} transaction={tx} onSelect={() => table.openTransaction(tx.id)} />
+    content = groupByDay(rows).map((group) => (
+      <section key={group.key}>
+        <h2 className={styles.groupLabel}>{group.label}</h2>
+        {group.rows.map((tx) => (
+          <TransactionRow
+            key={tx.id}
+            transaction={tx}
+            timeOnly
+            onSelect={() => table.openTransaction(tx.id)}
+          />
+        ))}
+      </section>
     ))
   }
 
@@ -97,45 +103,20 @@ export function TransactionsView() {
       <header className={styles.header}>
         <h1 className={styles.title}>Transactions</h1>
         <p className={styles.summary} aria-live="polite">
-          {meta && (
-            <>
-              {meta.total.toLocaleString('en-NG')} {meta.total === 1 ? 'transaction' : 'transactions'}
-            </>
-          )}
+          {meta ? summaryText(meta.total, table.filtersActive) : '\u00a0'}
           {isUpdating && <span className={styles.updating}>Updating…</span>}
         </p>
       </header>
 
-      <div className={styles.toolbar}>
-        <Input
-          label="Search transactions"
-          hideLabel
-          type="search"
-          leadingIcon="search"
-          placeholder="Search reference, name or description"
-          value={table.searchInput}
-          onChange={(e) => table.setSearchInput(e.target.value)}
-          fieldClassName={styles.search}
-        />
-        <div className={styles.mobileOnly}>
-          <Button variant="secondary" onClick={filterSheet.onOpen} aria-haspopup="dialog">
-            Filters{activeFilterCount > 0 && ` (${activeFilterCount})`}
-          </Button>
-        </div>
-        {table.filtersActive && (
-          <Button variant="ghost" onClick={table.resetFilters}>
-            Clear filters
-          </Button>
-        )}
-      </div>
-
-      <div className={styles.desktopOnly}>
-        <TransactionFilters
-          filters={filters}
-          onChange={table.setFilter}
-          dateRangeInvalid={table.dateRangeInvalid}
-        />
-      </div>
+      <TransactionFilters
+        search={table.searchInput}
+        onSearchChange={table.setSearchInput}
+        type={table.state.type}
+        status={table.state.status}
+        onTypeChange={(value) => table.setFilter('type', value)}
+        onStatusChange={(value) => table.setFilter('status', value)}
+        onClear={table.filtersActive ? table.resetFilters : undefined}
+      />
 
       <div ref={listRef} className={styles.listAnchor}>
         <Card padding="none" className={cx(styles.list, isPlaceholderData && styles.stale)}>
@@ -147,29 +128,6 @@ export function TransactionsView() {
         <Pagination page={table.state.page} totalPages={meta.totalPages} onPageChange={goToPage} />
       )}
 
-      <Drawer
-        open={filterSheet.isOpen}
-        title="Filters"
-        onClose={filterSheet.onClose}
-        footer={
-          <div className={styles.sheetFooter}>
-            <Button variant="secondary" onClick={table.resetFilters} disabled={!table.filtersActive}>
-              Clear
-            </Button>
-            <Button onClick={filterSheet.onClose} disabled={table.dateRangeInvalid}>
-              Show results
-            </Button>
-          </div>
-        }
-      >
-        <TransactionFilters
-          filters={filters}
-          onChange={table.setFilter}
-          dateRangeInvalid={table.dateRangeInvalid}
-          layout="stack"
-        />
-      </Drawer>
-
       <TransactionDetailsDrawer
         id={table.state.tx ?? null}
         placeholder={rows?.find((tx) => tx.id === table.state.tx)}
@@ -177,6 +135,13 @@ export function TransactionsView() {
       />
     </div>
   )
+}
+
+/** "237 transactions", or "0 results" / "12 results" while searching or filtering. */
+function summaryText(total: number, filtered: boolean) {
+  const count = total.toLocaleString('en-NG')
+  if (filtered) return `${count} ${total === 1 ? 'result' : 'results'}`
+  return `${count} ${total === 1 ? 'transaction' : 'transactions'}`
 }
 
 /** Suspense fallback while search params are read on the client. */

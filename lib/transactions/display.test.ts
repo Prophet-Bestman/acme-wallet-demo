@@ -1,4 +1,4 @@
-import { humanize, transactionStatusDisplay, transactionTypeDisplay } from './display'
+import { humanize, initials, transactionStatusDisplay, transactionTypeDisplay } from './display'
 
 beforeEach(() => {
   vi.spyOn(console, 'warn').mockImplementation(() => {})
@@ -66,5 +66,16 @@ describe('humanize', () => {
     ['  spaced__out  ', 'Spaced out'],
   ])('%s → %s', (raw, expected) => {
     expect(humanize(raw)).toBe(expected)
+  })
+})
+
+describe('initials', () => {
+  it.each([
+    ['Ada Okafor', 'AO'],
+    ['Okonkwo-Adeyemi Logistics & Haulage International Ltd', 'OA'],
+    ['kwame', 'K'],
+    ['& 123', ''],
+  ])('%s → %s', (name, expected) => {
+    expect(initials(name)).toBe(expected)
   })
 })

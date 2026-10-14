@@ -34,10 +34,33 @@ describe('TransactionRow', () => {
       <TransactionRow transaction={{ ...tx, type: 'crypto_purchase', status: 'under_review' }} />
     )
     expect(screen.getByText('Crypto purchase')).toBeInTheDocument()
-    expect(screen.getByRole('img', { name: 'Under review' })).toBeInTheDocument()
+    expect(screen.getByText('Under review')).toBeInTheDocument()
     expect(container.querySelector('svg path')).not.toBeNull()
     // Direction unknown: no + or - sign.
     expect(screen.getByText('$45.99')).toBeInTheDocument()
     vi.restoreAllMocks()
+  })
+
+  it('shows the status as a badge', () => {
+    render(<TransactionRow transaction={{ ...tx, status: 'pending' }} />)
+    expect(screen.getByText('Pending')).toBeInTheDocument()
+  })
+
+  it('shows counterparty initials, or the type icon without one', () => {
+    const { container, rerender } = render(
+      <TransactionRow
+        transaction={{ ...tx, type: 'transfer_in', counterparty: 'Okonkwo-Adeyemi Logistics' }}
+      />
+    )
+    expect(screen.getByText('OA')).toBeInTheDocument()
+    rerender(<TransactionRow transaction={tx} />)
+    expect(screen.queryByText('OA')).toBeNull()
+    expect(container.querySelector('svg')).not.toBeNull()
+  })
+
+  it('shows only the time, and no fee, inside a day group', () => {
+    render(<TransactionRow transaction={{ ...tx, createdAt: '2026-01-01T10:05:00' }} timeOnly />)
+    expect(screen.getByText('10:05')).toBeInTheDocument()
+    expect(screen.queryByText(/Fee/)).toBeNull()
   })
 })

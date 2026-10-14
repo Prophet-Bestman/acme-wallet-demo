@@ -1,11 +1,22 @@
+/*
+ * Desktop:  avatar | title + narration | status | amount
+ *                                               | time
+ * Mobile:   avatar | title + narration | amount
+ *                                      | status
+ */
 .row {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) auto auto;
+  /* Fixed status and amount columns keep the badges aligned whatever the amount. */
+  grid-template-columns: 36px minmax(0, 1fr) 112px 172px;
+  grid-template-areas:
+    'avatar main status amount'
+    'avatar main status meta';
   align-items: center;
-  gap: var(--space-4);
+  column-gap: var(--space-4);
+  row-gap: 2px;
   width: 100%;
-  min-height: 68px;
-  padding: var(--space-3) var(--space-6);
+  min-height: 60px;
+  padding: var(--space-3) var(--space-5);
   border: 0;
   border-bottom: 1px solid var(--color-border);
   background: none;
@@ -21,18 +32,12 @@
   background: var(--color-bg-subtle);
 }
 
-.icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
+.avatar {
+  grid-area: avatar;
 }
 
 .main {
+  grid-area: main;
   min-width: 0;
 }
 
@@ -45,7 +50,7 @@
 
 .narration {
   display: block;
-  margin-top: var(--space-1);
+  margin-top: 2px;
   overflow: hidden;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
@@ -53,13 +58,15 @@
   white-space: nowrap;
 }
 
-.end {
-  display: block;
-  text-align: right;
+.status {
+  grid-area: status;
+  justify-self: start;
 }
 
-.amount,
-.credit {
+.amount {
+  grid-area: amount;
+  align-self: end;
+  justify-self: end;
   font-size: var(--text-md);
   font-weight: var(--weight-semibold);
 }
@@ -69,8 +76,9 @@
 }
 
 .meta {
-  display: block;
-  margin-top: var(--space-1);
+  grid-area: meta;
+  align-self: start;
+  justify-self: end;
   font-size: var(--text-xs);
   color: var(--color-text-subtle);
   white-space: nowrap;
@@ -78,16 +86,28 @@
 
 @media (max-width: 640px) {
   .row {
-    gap: var(--space-3);
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'avatar main amount'
+      'avatar main status';
+    column-gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
   }
 
-  /* Let the date/fee line wrap so the narration column keeps some room at 375px. */
-  .end {
-    max-width: 48vw;
+  .status {
+    align-self: start;
+    justify-self: end;
   }
 
-  .meta {
-    white-space: normal;
+  /* The day heading already carries the date; the design drops the time on mobile. */
+  .timeOnly .meta {
+    display: none;
+  }
+
+  .row:not(.timeOnly) {
+    grid-template-areas:
+      'avatar main amount'
+      'avatar main status'
+      'avatar main meta';
   }
 }

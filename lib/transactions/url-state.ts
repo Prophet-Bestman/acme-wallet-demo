@@ -95,7 +95,7 @@ export function serializeTransactionUrlState(
 }
 
 /** ISO dates compare correctly as strings. */
-export const isDateRangeInvalid = ({ from, to }: Pick<TransactionUrlState, 'from' | 'to'>) =>
+const isDateRangeInvalid = ({ from, to }: Pick<TransactionUrlState, 'from' | 'to'>) =>
   Boolean(from && to && from > to)
 
 export const hasActiveFilters = (state: TransactionUrlState) =>

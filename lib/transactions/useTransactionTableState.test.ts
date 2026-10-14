@@ -106,10 +106,10 @@ describe('useTransactionTableState', () => {
     expect(nav.replace).not.toHaveBeenCalled()
   })
 
-  it('flags an inverted date range and keeps it out of the query', () => {
+  it('keeps an inverted date range from a shared link out of the query', () => {
     const { result } = setup('from=2026-02-01&to=2026-01-01')
-    expect(result.current.dateRangeInvalid).toBe(true)
     expect(result.current.queryParams.from).toBeUndefined()
+    expect(result.current.queryParams.to).toBeUndefined()
   })
 
   it('opens details with a push and closes them with Back', () => {

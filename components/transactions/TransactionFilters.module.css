@@ -1,19 +1,31 @@
-.filters {
+.bar {
   display: grid;
+  grid-template-columns: minmax(0, 500px) 176px 158px auto;
+  align-items: end;
+  justify-content: start;
   gap: var(--space-3);
 }
 
-.row {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  align-items: start;
-}
-
-.stack {
-  grid-template-columns: minmax(0, 1fr);
+.clear {
+  justify-self: start;
 }
 
 @media (max-width: 900px) {
-  .row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .bar {
+    grid-template-columns: minmax(0, 1fr) 160px 150px;
+  }
+
+  .clear {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .search {
+    grid-column: 1 / -1;
   }
 }

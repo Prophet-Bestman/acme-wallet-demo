@@ -3,7 +3,6 @@ import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { useDebounce } from '@/lib/hooks'
 import {
   hasActiveFilters,
-  isDateRangeInvalid,
   normalizeQuery,
   parseTransactionUrlState,
   serializeTransactionUrlState,
@@ -96,7 +95,6 @@ export function useTransactionTableState() {
     setFilter,
     resetFilters,
     filtersActive: hasActiveFilters(state),
-    dateRangeInvalid: isDateRangeInvalid(state),
     setPage,
     clampPage,
     openTransaction,

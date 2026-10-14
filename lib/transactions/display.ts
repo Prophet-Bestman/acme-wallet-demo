@@ -69,3 +69,12 @@ export function transactionStatusDisplay(raw: string): StatusDisplay {
   warnUnknown('status', raw)
   return { label: raw.trim() ? humanize(raw) : 'Unknown', tone: 'neutral' }
 }
+
+/** "Ada Okafor" → "AO", "Okonkwo-Adeyemi Logistics & …" → "OA". Empty when there are no letters. */
+export const initials = (name: string) =>
+  name
+    .split(/[\s-]+/)
+    .filter((word) => /^\p{L}/u.test(word))
+    .slice(0, 2)
+    .map((word) => word[0].toUpperCase())
+    .join('')

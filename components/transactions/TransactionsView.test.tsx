@@ -153,10 +153,10 @@ describe('TransactionsView', () => {
     expect(nav.push).toHaveBeenLastCalledWith('/transactions?status=pending', { scroll: false })
   })
 
-  it('flags an inverted date range and never sends it', async () => {
+  it('never sends an inverted date range from a shared link', async () => {
     fetchMock.mockImplementation(() => Promise.resolve(page([tx('a')])))
     renderView('from=2026-10-10&to=2026-01-01')
-    expect(await screen.findByText('Must be on or after the From date')).toBeInTheDocument()
+    await screen.findByText('Narration a')
     const url = fetchMock.mock.calls[0][0] as string
     expect(url).not.toContain('from=')
     expect(url).not.toContain('to=')
