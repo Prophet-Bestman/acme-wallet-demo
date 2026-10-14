@@ -75,3 +75,19 @@
   color: var(--color-text-subtle);
   white-space: nowrap;
 }
+
+@media (max-width: 640px) {
+  .row {
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  /* Let the date/fee line wrap so the narration column keeps some room at 375px. */
+  .end {
+    max-width: 48vw;
+  }
+
+  .meta {
+    white-space: normal;
+  }
+}

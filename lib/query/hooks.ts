@@ -1,6 +1,6 @@
 'use client'
 import { keepPreviousData, useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { Currency } from '@/types/api'
+import type { Currency, Transaction } from '@/types/api'
 import {
   convert,
   getMe,
@@ -28,11 +28,13 @@ export function useTransactions(params: TransactionQuery) {
   })
 }
 
-export function useTransaction(id: string | null) {
+/** `placeholder` (e.g. the row that was clicked) shows instantly while the full record loads. */
+export function useTransaction(id: string | null, placeholder?: Transaction) {
   return useQuery({
     queryKey: transactionKeys.detail(id ?? ''),
     queryFn: ({ signal }) => getTransaction(id!, { signal }).then((res) => res.data),
     enabled: id !== null,
+    placeholderData: placeholder,
   })
 }
 
