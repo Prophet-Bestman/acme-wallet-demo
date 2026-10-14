@@ -62,3 +62,21 @@ describe('BalanceSummary', () => {
     expect(screen.queryByText(/₦/)).toBeNull()
   })
 })
+
+describe('BalanceSummary hide toggle', () => {
+  it('hides every amount on the page, not just the total, and remembers it', async () => {
+    const { WalletCard } = await import('./WalletCard')
+    renderSummary([{ currency: 'NGN', balance: 100000 }])
+    render(<WalletCard wallet={{ currency: 'NGN', balance: 250000 }} />)
+    expect(screen.getByText('₦2,500.00')).toBeInTheDocument()
+
+    const { default: userEvent } = await import('@testing-library/user-event')
+    await userEvent.click(screen.getByRole('button', { name: 'Hide balances' }))
+    expect(screen.queryByText('₦1,000.00')).toBeNull()
+    expect(screen.queryByText('₦2,500.00')).toBeNull()
+    expect(window.localStorage.getItem('acme.hideBalances')).toBe('1')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Show balances' }))
+    expect(screen.getByText('₦2,500.00')).toBeInTheDocument()
+  })
+})

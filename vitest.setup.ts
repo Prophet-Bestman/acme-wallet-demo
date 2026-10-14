@@ -4,3 +4,6 @@ import '@testing-library/jest-dom/vitest'
 Element.prototype.hasPointerCapture ??= () => false
 Element.prototype.releasePointerCapture ??= () => {}
 Element.prototype.scrollIntoView ??= () => {}
+
+// "Hide balances" persists in localStorage; don't let one test's choice leak into the next.
+afterEach(() => window.localStorage.clear())

@@ -84,13 +84,13 @@ export default function ConvertPage() {
           <div className={styles.summaryRow}>
             <dt>Fee (1.5%)</dt>
             <dd>
-              <Money amount={fee} currency={from} />
+              <Money amount={fee} currency={from} sensitive={false} />
             </dd>
           </div>
           <div className={styles.summaryTotal}>
             <dt>You get</dt>
             <dd>
-              <Money amount={youGet} currency={to} />
+              <Money amount={youGet} currency={to} sensitive={false} />
             </dd>
           </div>
         </dl>
@@ -108,7 +108,8 @@ export default function ConvertPage() {
 
       {result && (
         <Card className={styles.success}>
-          Conversion successful. You received <Money amount={result.received} currency={result.to} />.
+          Conversion successful. You received{' '}
+          <Money amount={result.received} currency={result.to} sensitive={false} />.
         </Card>
       )}
     </div>

@@ -1,7 +1,7 @@
 import type { Transaction } from '@/types/api'
 import { Badge, Money } from '@/components/ui'
 import { cx } from '@/lib/cx'
-import { formatDateTime, formatMoney, formatTime } from '@/lib/format'
+import { formatDateTime, formatTime } from '@/lib/format'
 import { transactionStatusDisplay, transactionTypeDisplay } from '@/lib/transactions/display'
 import { TransactionAvatar } from './TransactionAvatar'
 import styles from './TransactionRow.module.css'
@@ -40,7 +40,12 @@ export function TransactionRow({ transaction: tx, onSelect, timeOnly = false }: 
       />
       <span className={styles.meta}>
         {timeOnly ? formatTime(tx.createdAt) : formatDateTime(tx.createdAt)}
-        {!timeOnly && tx.fee > 0 && ` · Fee ${formatMoney(tx.fee, tx.currency)}`}
+        {!timeOnly && tx.fee > 0 && (
+          <>
+            {' · Fee '}
+            <Money amount={tx.fee} currency={tx.currency} />
+          </>
+        )}
       </span>
     </button>
   )

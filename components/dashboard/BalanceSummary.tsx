@@ -1,7 +1,7 @@
 'use client'
-import { useState } from 'react'
 import type { Currency, Wallet } from '@/types/api'
 import { Button, Card, Money } from '@/components/ui'
+import { setBalancesHidden, useBalancesHidden } from '@/lib/hooks'
 import { useRates } from '@/lib/query/hooks'
 import styles from './BalanceSummary.module.css'
 
@@ -29,12 +29,11 @@ function useTotalInBase(wallets: Wallet[]) {
 }
 
 export function BalanceSummary({ wallets }: { wallets: Wallet[] }) {
-  const [hidden, setHidden] = useState(false)
+  const hidden = useBalancesHidden()
   const result = useTotalInBase(wallets)
 
   let value
-  if (hidden) value = '••••••'
-  else if (result.status === 'success') value = <Money amount={result.total} currency={BASE} />
+  if (result.status === 'success') value = <Money amount={result.total} currency={BASE} />
   else if (result.status === 'pending') value = '…'
   else value = '—'
 
@@ -57,7 +56,8 @@ export function BalanceSummary({ wallets }: { wallets: Wallet[] }) {
         variant="ghost"
         size="sm"
         iconLeft={hidden ? 'eye' : 'eye-off'}
-        onClick={() => setHidden(!hidden)}
+        onClick={() => setBalancesHidden(!hidden)}
+        aria-label={hidden ? 'Show balances' : 'Hide balances'}
       >
         {hidden ? 'Show' : 'Hide'}
       </Button>
