@@ -44,7 +44,7 @@ export default function ConvertPage() {
             label="From"
             options={CURRENCY_OPTIONS}
             value={from}
-            onChange={(e) => setFrom(e.target.value as Currency)}
+            onValueChange={(value) => setFrom(value as Currency)}
             fieldClassName={styles.currency}
           />
           <Input
@@ -71,7 +71,7 @@ export default function ConvertPage() {
           label="To"
           options={CURRENCY_OPTIONS}
           value={to}
-          onChange={(e) => setTo(e.target.value as Currency)}
+          onValueChange={(value) => setTo(value as Currency)}
           fieldClassName={styles.to}
         />
 

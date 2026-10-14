@@ -5,12 +5,15 @@ import { TRANSACTION_STATUS_LABELS, TRANSACTION_TYPE_LABELS } from '@/lib/format
 import { TRANSACTION_STATUSES, TRANSACTION_TYPES } from '@/lib/transactions/url-state'
 import styles from './TransactionFilters.module.css'
 
+// Radix Select can't use '' as an item value, so "All" is a sentinel that maps to undefined.
+const ALL = 'all'
+
 const TYPE_OPTIONS = [
-  { value: '', label: 'All types' },
+  { value: ALL, label: 'All types' },
   ...TRANSACTION_TYPES.map((type) => ({ value: type, label: TRANSACTION_TYPE_LABELS[type] })),
 ]
 const STATUS_OPTIONS = [
-  { value: '', label: 'All statuses' },
+  { value: ALL, label: 'All statuses' },
   ...TRANSACTION_STATUSES.map((status) => ({ value: status, label: TRANSACTION_STATUS_LABELS[status] })),
 ]
 
@@ -48,14 +51,14 @@ export function TransactionFilters({
       <Select
         label="Type"
         options={TYPE_OPTIONS}
-        value={type ?? ''}
-        onChange={(e) => onTypeChange((e.target.value || undefined) as TransactionType | undefined)}
+        value={type ?? ALL}
+        onValueChange={(value) => onTypeChange(value === ALL ? undefined : (value as TransactionType))}
       />
       <Select
         label="Status"
         options={STATUS_OPTIONS}
-        value={status ?? ''}
-        onChange={(e) => onStatusChange((e.target.value || undefined) as TransactionStatus | undefined)}
+        value={status ?? ALL}
+        onValueChange={(value) => onStatusChange(value === ALL ? undefined : (value as TransactionStatus))}
       />
       {onClear && (
         <Button variant="ghost" onClick={onClear} className={styles.clear}>

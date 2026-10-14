@@ -16,8 +16,15 @@ describe('Field labelling', () => {
   })
 
   it('gives Select an accessible name', () => {
-    render(<Select label="Currency" options={[{ value: 'NGN', label: 'NGN' }]} />)
-    expect(screen.getByLabelText('Currency').tagName).toBe('SELECT')
+    render(
+      <Select
+        label="Currency"
+        options={[{ value: 'NGN', label: 'NGN' }]}
+        value="NGN"
+        onValueChange={() => {}}
+      />
+    )
+    expect(screen.getByRole('combobox', { name: 'Currency' })).toHaveTextContent('NGN')
   })
 
   it('gives each field its own id', () => {

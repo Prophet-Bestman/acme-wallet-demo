@@ -149,8 +149,8 @@ describe('TransactionsView', () => {
     fetchMock.mockImplementation(() => Promise.resolve(page([tx('a')])))
     renderView()
     await screen.findByText('Narration a')
-    // The desktop and mobile-sheet filters share labels; the sheet is closed, so only one is rendered.
-    await userEvent.selectOptions(screen.getByLabelText('Status'), 'pending')
+    await userEvent.click(screen.getByRole('combobox', { name: 'Status' }))
+    await userEvent.click(await screen.findByRole('option', { name: 'Pending' }))
     expect(nav.push).toHaveBeenLastCalledWith('/transactions?status=pending', { scroll: false })
   })
 

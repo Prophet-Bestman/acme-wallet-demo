@@ -17,12 +17,15 @@ export interface FieldProps {
 /** id of the hint/error text, for the control's aria-describedby. */
 export const fieldDescriptionId = (id: string) => `${id}-description`
 
+/** id of the label, for controls that `<label for>` can't name (e.g. a custom combobox). */
+export const fieldLabelId = (id: string) => `${id}-label`
+
 /** Label + control + hint/error. Used by Input and Select. */
 export function Field({ id, label, hint, error, hideLabel, className, children }: FieldProps) {
   const descriptionId = fieldDescriptionId(id)
   return (
     <div className={cx(styles.field, className)}>
-      <label htmlFor={id} className={cx(styles.label, hideLabel && 'visually-hidden')}>
+      <label id={fieldLabelId(id)} htmlFor={id} className={cx(styles.label, hideLabel && 'visually-hidden')}>
         {label}
       </label>
       {children}
