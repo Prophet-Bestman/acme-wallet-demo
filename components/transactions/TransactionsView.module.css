@@ -79,19 +79,20 @@
   color: var(--color-primary);
 }
 
+.danger {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
 .stateTitle {
   font-size: var(--text-base);
   font-weight: var(--weight-semibold);
 }
 
 .stateBody {
-  max-width: 320px;
+  max-width: 360px;
   margin-bottom: var(--space-2);
   font-size: var(--text-md);
-  color: var(--color-text-muted);
-}
-
-.drawerLoading {
   color: var(--color-text-muted);
 }
 

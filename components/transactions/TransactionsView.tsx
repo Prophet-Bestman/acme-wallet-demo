@@ -7,7 +7,7 @@ import { cx } from '@/lib/cx'
 import { useTransaction, useTransactions } from '@/lib/query/hooks'
 import { groupByDay } from '@/lib/transactions/group'
 import { useTransactionTableState } from '@/lib/transactions/useTransactionTableState'
-import { TransactionDetails } from './TransactionDetails'
+import { TransactionDetails, TransactionDetailsSkeleton } from './TransactionDetails'
 import { TransactionFilters } from './TransactionFilters'
 import { TransactionListSkeleton } from './TransactionListSkeleton'
 import { TransactionRow } from './TransactionRow'
@@ -15,7 +15,7 @@ import styles from './TransactionsView.module.css'
 
 export function TransactionsView() {
   const table = useTransactionTableState()
-  const { data, isPending, isError, error, isFetching, isPlaceholderData, refetch } = useTransactions(
+  const { data, isPending, isError, isFetching, isPlaceholderData, refetch } = useTransactions(
     table.queryParams
   )
   const listRef = useRef<HTMLDivElement>(null)
@@ -45,15 +45,12 @@ export function TransactionsView() {
     content = (
       <StateMessage
         icon="alert"
+        tone="danger"
         title="We couldn't load your transactions"
-        body={
-          error instanceof ApiError && error.code === 'NETWORK'
-            ? 'Check your connection and try again.'
-            : 'Something went wrong on our side. Please try again.'
-        }
+        body="Check your connection and try again."
         action={
-          <Button variant="secondary" iconLeft="refresh" onClick={() => void refetch()} disabled={isFetching}>
-            {isFetching ? 'Retrying…' : 'Retry'}
+          <Button iconLeft="refresh" onClick={() => void refetch()} disabled={isFetching}>
+            Try again
           </Button>
         }
         role="alert"
@@ -63,8 +60,8 @@ export function TransactionsView() {
     content = table.filtersActive ? (
       <StateMessage
         icon="search"
-        title="No results"
-        body="No transactions match your search or filters."
+        title="No transactions match your filters"
+        body="Try a different search term or remove some filters."
         action={
           <Button variant="secondary" onClick={table.resetFilters}>
             Clear filters
@@ -75,7 +72,7 @@ export function TransactionsView() {
       <StateMessage
         icon="inbox"
         title="No transactions yet"
-        body="Deposits, transfers and payments will show up here."
+        body="When you add money, send a transfer or pay with your card, it will show up here."
       />
     )
   } else if (!rows?.length) {
@@ -125,7 +122,13 @@ export function TransactionsView() {
       </div>
 
       {meta && rows && rows.length > 0 && (
-        <Pagination page={table.state.page} totalPages={meta.totalPages} onPageChange={goToPage} />
+        <Pagination
+          page={table.state.page}
+          totalPages={meta.totalPages}
+          total={meta.total}
+          pageSize={meta.limit}
+          onPageChange={goToPage}
+        />
       )}
 
       <TransactionDetailsDrawer
@@ -177,7 +180,7 @@ function TransactionDetailsDrawer({
       <StateMessage
         icon="search"
         title="Transaction not found"
-        body="It may have been removed, or the link is incorrect."
+        body="It may have been removed, or the link is wrong."
         action={
           <Button variant="secondary" onClick={onClose}>
             Back to transactions
@@ -189,18 +192,19 @@ function TransactionDetailsDrawer({
     body = (
       <StateMessage
         icon="alert"
+        tone="danger"
         title="We couldn't load this transaction"
-        body="Please try again."
+        body="Check your connection and try again."
         action={
-          <Button variant="secondary" iconLeft="refresh" onClick={() => void refetch()} disabled={isFetching}>
-            {isFetching ? 'Retrying…' : 'Retry'}
+          <Button iconLeft="refresh" onClick={() => void refetch()} disabled={isFetching}>
+            Try again
           </Button>
         }
         role="alert"
       />
     )
   } else {
-    body = <p className={styles.drawerLoading}>Loading…</p>
+    body = <TransactionDetailsSkeleton />
   }
 
   return (
@@ -212,12 +216,14 @@ function TransactionDetailsDrawer({
 
 function StateMessage({
   icon,
+  tone = 'primary',
   title,
   body,
   action,
   role,
 }: {
   icon: IconName
+  tone?: 'primary' | 'danger'
   title: string
   body: string
   action?: ReactNode
@@ -225,7 +231,7 @@ function StateMessage({
 }) {
   return (
     <div className={styles.state} role={role}>
-      <span className={styles.stateIcon}>
+      <span className={cx(styles.stateIcon, tone === 'danger' && styles.danger)}>
         <Icon name={icon} size={22} />
       </span>
       <h2 className={styles.stateTitle}>{title}</h2>

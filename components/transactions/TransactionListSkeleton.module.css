@@ -1,11 +1,17 @@
-/* Mirrors TransactionRow's grid so content doesn't jump when data arrives. */
+/* Mirrors the day heading and TransactionRow's size so content doesn't jump when data arrives. */
+.groupBar {
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-subtle);
+}
+
 .row {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) auto;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-4);
-  min-height: 68px;
-  padding: var(--space-3) var(--space-6);
+  min-height: 60px;
+  padding: var(--space-3) var(--space-5);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -15,14 +21,19 @@
 
 .icon,
 .line {
-  background: linear-gradient(90deg, var(--color-bg) 25%, var(--color-bg-subtle) 50%, var(--color-bg) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-border) 25%,
+    var(--color-bg-subtle) 50%,
+    var(--color-border) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
 .icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-full);
 }
 
@@ -39,7 +50,7 @@
 
 .line {
   display: block;
-  height: 12px;
+  height: 10px;
   border-radius: var(--radius-sm);
 }
 
@@ -60,7 +71,8 @@
 }
 
 @media (max-width: 640px) {
-  .row {
-    padding: var(--space-3) var(--space-4);
+  .row,
+  .groupBar {
+    padding-inline: var(--space-4);
   }
 }

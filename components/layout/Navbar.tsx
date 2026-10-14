@@ -27,6 +27,7 @@ export function Navbar() {
               key={link.href}
               href={link.href}
               className={cx(styles.link, pathname === link.href && styles.active)}
+              aria-current={pathname === link.href ? 'page' : undefined}
             >
               {link.label}
             </Link>

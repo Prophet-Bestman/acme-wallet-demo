@@ -110,7 +110,7 @@ describe('TransactionsView', () => {
     renderView('page=12')
     await vi.waitFor(() => expect(nav.replace).toHaveBeenCalled())
     expect(screen.queryByText('No transactions yet')).toBeNull()
-    expect(screen.queryByText('No results')).toBeNull()
+    expect(screen.queryByText('No transactions match your filters')).toBeNull()
   })
 
   it('distinguishes "no transactions yet" from "no results"', async () => {
@@ -120,8 +120,9 @@ describe('TransactionsView', () => {
     unmount()
 
     renderView('q=zzz')
-    expect(await screen.findByText('No results')).toBeInTheDocument()
-    const state = screen.getByText('No results').parentElement!
+    expect(await screen.findByText('No transactions match your filters')).toBeInTheDocument()
+    expect(screen.getByText('0 results')).toBeInTheDocument()
+    const state = screen.getByText('No transactions match your filters').parentElement!
     await userEvent.click(within(state).getByRole('button', { name: 'Clear filters' }))
     expect(nav.push).toHaveBeenLastCalledWith('/transactions', { scroll: false })
   })
@@ -132,7 +133,7 @@ describe('TransactionsView', () => {
     expect(await screen.findByText("We couldn't load your transactions")).toBeInTheDocument()
 
     fetchMock.mockResolvedValueOnce(page([tx('a')]))
-    await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
     expect(await screen.findByText('Narration a')).toBeInTheDocument()
   })
 
