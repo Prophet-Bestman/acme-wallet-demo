@@ -1,8 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
 import type { Transaction } from '@/types/api'
-import { Button, Money } from '@/components/ui'
-import { formatDateTime, TRANSACTION_STATUS_LABELS, TRANSACTION_TYPE_LABELS } from '@/lib/format'
+import { Badge, Button, Money } from '@/components/ui'
+import { formatDateTime } from '@/lib/format'
+import { transactionStatusDisplay, transactionTypeDisplay } from '@/lib/transactions/display'
 import styles from './TransactionDetails.module.css'
 
 export interface TransactionDetailsProps {
@@ -11,6 +12,7 @@ export interface TransactionDetailsProps {
 
 /** Body of the transaction details drawer, shared by the dashboard and /transactions. */
 export function TransactionDetails({ transaction: tx }: TransactionDetailsProps) {
+  const status = transactionStatusDisplay(tx.status)
   return (
     <dl className={styles.details}>
       <dt>Amount</dt>
@@ -22,9 +24,13 @@ export function TransactionDetails({ transaction: tx }: TransactionDetailsProps)
         <Money amount={tx.fee} currency={tx.currency} />
       </dd>
       <dt>Type</dt>
-      <dd>{TRANSACTION_TYPE_LABELS[tx.type]}</dd>
+      <dd>{transactionTypeDisplay(tx.type).label}</dd>
       <dt>Status</dt>
-      <dd>{TRANSACTION_STATUS_LABELS[tx.status]}</dd>
+      <dd>
+        <Badge tone={status.tone} dot>
+          {status.label}
+        </Badge>
+      </dd>
       <dt>Date</dt>
       <dd>{formatDateTime(tx.createdAt)}</dd>
       {tx.counterparty && (

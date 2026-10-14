@@ -1,13 +1,6 @@
-import type {
-  Conversion,
-  Currency,
-  Rate,
-  Transaction,
-  TransactionStatus,
-  TransactionType,
-  User,
-} from '@/types/api'
+import type { Conversion, Currency, Rate, TransactionStatus, TransactionType, User } from '@/types/api'
 import { api } from './client'
+import { parseTransactionDetail, parseTransactionList } from './validate'
 
 export interface TransactionQuery {
   page?: number
@@ -34,10 +27,10 @@ function toSearchParams(query: object): string {
 export const getMe = (init?: RequestInit) => api.get<User>('/me', init)
 
 export const getTransactions = (query: TransactionQuery = {}, init?: RequestInit) =>
-  api.get<Transaction[]>(`/transactions${toSearchParams(query)}`, init)
+  api.get<unknown>(`/transactions${toSearchParams(query)}`, init).then(parseTransactionList)
 
 export const getTransaction = (id: string, init?: RequestInit) =>
-  api.get<Transaction>(`/transactions/${encodeURIComponent(id)}`, init)
+  api.get<unknown>(`/transactions/${encodeURIComponent(id)}`, init).then(parseTransactionDetail)
 
 export const getRate = (from: Currency, to: Currency, init?: RequestInit) =>
   api.get<Rate>(`/rates${toSearchParams({ from, to })}`, init)

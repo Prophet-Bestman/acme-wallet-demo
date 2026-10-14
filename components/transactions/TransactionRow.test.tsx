@@ -27,4 +27,17 @@ describe('TransactionRow', () => {
     expect(screen.getByText(/Fee \$0\.30/)).toBeInTheDocument()
     expect(screen.queryByText(/₦30/)).toBeNull()
   })
+
+  it('renders an unknown type and status without breaking', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { container } = render(
+      <TransactionRow transaction={{ ...tx, type: 'crypto_purchase', status: 'under_review' }} />
+    )
+    expect(screen.getByText('Crypto purchase')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Under review' })).toBeInTheDocument()
+    expect(container.querySelector('svg path')).not.toBeNull()
+    // Direction unknown: no + or - sign.
+    expect(screen.getByText('$45.99')).toBeInTheDocument()
+    vi.restoreAllMocks()
+  })
 })

@@ -9,11 +9,17 @@ export type TransactionType =
 
 export type TransactionStatus = 'successful' | 'pending' | 'failed'
 
+/**
+ * A value the backend owns and may extend. Known values still autocomplete and narrow,
+ * but code must handle the unknown case (see lib/transactions/display.ts).
+ */
+export type OpenEnum<T extends string> = T | (string & {})
+
 export interface Transaction {
   id: string
   reference: string
-  type: TransactionType
-  status: TransactionStatus
+  type: OpenEnum<TransactionType>
+  status: OpenEnum<TransactionStatus>
   currency: Currency
   /** Minor units (kobo / cents / pesewas). Always positive. */
   amount: number

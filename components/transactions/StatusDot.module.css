@@ -5,14 +5,19 @@
   border-radius: var(--radius-full);
 }
 
-.successful {
+.success {
   background: var(--color-success);
 }
 
-.pending {
+.warning {
   background: var(--color-warning);
 }
 
-.failed {
+.danger {
   background: var(--color-danger);
+}
+
+.neutral,
+.primary {
+  background: var(--color-text-subtle);
 }
