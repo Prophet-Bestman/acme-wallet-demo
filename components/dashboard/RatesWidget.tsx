@@ -2,7 +2,7 @@
 import type { Currency } from '@/types/api'
 import { Card, CardHeader } from '@/components/ui'
 import { useRates } from '@/lib/query/hooks'
-import { formatTime } from '@/lib/format'
+import { formatRate, formatTime } from '@/lib/format'
 import styles from './RatesWidget.module.css'
 
 const QUOTES: Currency[] = ['USD', 'GHS']
@@ -20,7 +20,7 @@ export function RatesWidget({ base }: { base: Currency }) {
           return (
             <div key={quote} className={styles.row}>
               <dt>1 {quote}</dt>
-              <dd className={styles.value}>{rate ? `${rate.rate} ${base}` : '—'}</dd>
+              <dd className={styles.value}>{rate ? `${formatRate(rate.rate)} ${base}` : '—'}</dd>
             </div>
           )
         })}

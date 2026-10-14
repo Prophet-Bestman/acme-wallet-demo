@@ -1,4 +1,5 @@
 'use client'
+import { useEffect, useEffectEvent, useRef } from 'react'
 import type { User } from '@/types/api'
 import { Avatar, Icon } from '@/components/ui'
 import { useDisclosure } from '@/lib/hooks'
@@ -12,12 +13,41 @@ const TIER_LABELS: Record<User['tier'], string> = {
 }
 
 export function UserMenu() {
-  const { isOpen: open, toggle } = useDisclosure()
+  const { isOpen: open, toggle, onClose } = useDisclosure()
   const { data: user } = useMe()
+  const menuRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
+  // Close on a click outside, or on Escape (returning focus to the trigger).
+  const handlePointerDown = useEffectEvent((event: PointerEvent) => {
+    if (!menuRef.current?.contains(event.target as Node)) onClose()
+  })
+  const handleKeyDown = useEffectEvent((event: KeyboardEvent) => {
+    if (event.key !== 'Escape') return
+    onClose()
+    triggerRef.current?.focus()
+  })
+  useEffect(() => {
+    if (!open) return
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [open])
 
   return (
-    <div className={styles.menu}>
-      <button type="button" className={styles.trigger} onClick={toggle} aria-expanded={open}>
+    <div ref={menuRef} className={styles.menu}>
+      <button
+        ref={triggerRef}
+        type="button"
+        className={styles.trigger}
+        onClick={toggle}
+        aria-expanded={open}
+        // Starts with the visible first name; still named on mobile, where the name is hidden.
+        aria-label={user ? `${user.firstName}, account menu` : 'Account menu'}
+      >
         <Avatar src={user?.avatarUrl ?? null} alt="" size="sm" />
         <span className={styles.name}>{user?.firstName}</span>
         <Icon name="chevron-down" size={16} />

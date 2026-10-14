@@ -4,7 +4,7 @@ import type { Currency } from '@/types/api'
 import { CURRENCIES } from '@/types/api'
 import { Button, Card, Input, Money, Select } from '@/components/ui'
 import { ApiError } from '@/lib/api/client'
-import { parseMoney } from '@/lib/format'
+import { formatRate, parseMoney } from '@/lib/format'
 import { useConvert, useMe, useRate } from '@/lib/query/hooks'
 import styles from './page.module.css'
 
@@ -49,8 +49,9 @@ export default function ConvertPage() {
           />
           <Input
             label="Amount"
-            type="number"
+            type="text"
             inputMode="decimal"
+            autoComplete="off"
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
@@ -78,7 +79,7 @@ export default function ConvertPage() {
         <dl className={styles.summary}>
           <div className={styles.summaryRow}>
             <dt>Rate</dt>
-            <dd>{rate ? `1 ${from} = ${rate.rate} ${to}` : '…'}</dd>
+            <dd>{rate ? `1 ${from} = ${formatRate(rate.rate)} ${to}` : '…'}</dd>
           </div>
           <div className={styles.summaryRow}>
             <dt>Fee (1.5%)</dt>

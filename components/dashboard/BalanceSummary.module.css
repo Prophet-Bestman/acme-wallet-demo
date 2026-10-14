@@ -1,8 +1,14 @@
 .card {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
+}
+
+/* min-width: 0 lets a long total shrink/wrap instead of pushing "Hide" out of the card. */
+.main {
+  min-width: 0;
 }
 
 .label {
@@ -15,4 +21,16 @@
   font-size: var(--text-3xl);
   font-weight: var(--weight-heavy);
   letter-spacing: -0.02em;
+}
+
+.note {
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+}
+
+@media (max-width: 640px) {
+  .total {
+    font-size: var(--text-2xl);
+  }
 }
